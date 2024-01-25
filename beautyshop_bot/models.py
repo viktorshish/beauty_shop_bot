@@ -48,7 +48,10 @@ class TimeSlot(models.Model):
 class Speciality(models.Model):
     name = models.CharField(
         max_length=200,
-        verbose_name="Название специализации",
+        verbose_name="Название услуги",
+    )
+    description = models.TextField(
+        verbose_name="Описание услуги",
     )
 
     def __str__(self):
@@ -58,7 +61,6 @@ class Speciality(models.Model):
         verbose_name = 'Услуги'
         verbose_name_plural = 'Услуги'
         ordering = ['-name']
-
 
 
 class Master(models.Model):
@@ -109,9 +111,13 @@ class Client(models.Model):
         max_length=30,
         verbose_name="Телефон",
     )
-    telegram = models.CharField(
+    telegram_chat_id = models.CharField(
         max_length=30,
         verbose_name="Телеграмм",
+    )
+    telegram_nickname = models.CharField(
+        max_length=30,
+        verbose_name="Ник в телеграме",
     )
 
     def __str__(self):
