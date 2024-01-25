@@ -33,6 +33,7 @@ class TimeSlot(models.Model):
     salon = models.ForeignKey(
         Salon,
         verbose_name="Салон смены",
+        related_name="shifts",
         on_delete=models.CASCADE,
     )
 
