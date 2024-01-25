@@ -23,6 +23,7 @@ env.read_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+TIME_ZONE = env.str("TIME_ZONE")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -85,6 +86,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'TIME_ZONE': TIME_ZONE,
     }
 }
 
@@ -113,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
