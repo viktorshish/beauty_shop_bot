@@ -30,6 +30,7 @@ pip install -r requirements.txt
 ```
 DJANGO_SECRET_KEY='DJANGO_KEY'  
 DJANGO_DEBUG=True
+TIME_ZONE='Europe/Moscow'
 ```
 
 
