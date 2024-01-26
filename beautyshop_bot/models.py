@@ -146,6 +146,7 @@ class Order(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Салон",
         related_name="orders",
+        null=True,
     )
     order_time = models.DateTimeField(
         verbose_name="Начало записи",
