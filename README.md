@@ -30,7 +30,29 @@ pip install -r requirements.txt
 ```
 DJANGO_SECRET_KEY='DJANGO_KEY'  
 DJANGO_DEBUG=True
+TIME_ZONE='Europe/Moscow'
+TG_TOKEN='TOKEN'
 ```
+
+* Скопировать в корень проекта базу данных
+
+Как пользоваться:
+
+* Запуск бота:
+
+```
+python manage.py bot
+```
+
+* Запуск админки:
+```
+python manage.py runserver
+```
+
+Админ панель находится по адресу:
+<http://127.0.0.1:8000/admin/>
+
+
 
 
 
