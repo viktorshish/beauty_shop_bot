@@ -1,6 +1,6 @@
 from .bot_utils import main_keyboard
 
-from beautyshop_bot.db_utils import get_salon_contacts
+from .db_utils import get_salon_contacts, get_client_orders
 
 
 def greet_user(update, context):
@@ -13,8 +13,6 @@ def greet_user(update, context):
 
 
 def show_contacts(update, contex):
-    chat_id = update.effective_chat.id
-
     contacts = get_salon_contacts()
 
     answer_message = f"У нас есть следующие салоны:\n\n"
@@ -25,3 +23,20 @@ def show_contacts(update, contex):
         answer_message += f"\n"
 
     update.message.reply_text(answer_message, reply_markup=main_keyboard())
+
+
+def show_my_orders(update, context):
+    chat_id = update.message.chat_id
+
+    orders = get_client_orders(chat_id)
+
+    message = f'Ваши заказы:\n\n'
+    for order in orders:
+        message += f"Услуга: {order['speciality']}\n"
+        message += f"Мастер: {order['master']}\n"
+        message += f"Время: {order['time']}\n"
+        message += f"\n"
+
+    update.message.reply_text(message, reply_markup=main_keyboard())
+
+
