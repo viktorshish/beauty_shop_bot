@@ -7,6 +7,7 @@ def main_keyboard():
         ['Хочу записаться', 'Мои записи'],
     ], resize_keyboard=True)
 
+
 def method_keyboard():
     return ReplyKeyboardMarkup([
         ['В салон', 'К мастеру', 'На услугу'],
