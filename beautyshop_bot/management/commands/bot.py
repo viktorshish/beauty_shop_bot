@@ -5,7 +5,7 @@ from django.conf import settings
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
 from .bot_handlers import greet_user, show_contacts
-from .bot_booking import booking_start
+from .bot_booking import booking_start, booking_surname, booking_method_choice, booking_method_1, booking_method_2, booking_method_3
 
 
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +26,17 @@ class Command(BaseCommand):
             entry_points=[
                 MessageHandler(Filters.regex('^(Хочу записаться)$'), booking_start)
             ],
-            states={},
+            states={
+                "name": [MessageHandler(Filters.text, booking_surname)],
+                "surname": [MessageHandler(Filters.text, booking_method_choice)],
+                "method_choice": [MessageHandler(Filters.text, booking_method_choice)],
+                "booking": [
+                    MessageHandler(Filters.regex('В салон'), booking_method_1),
+                    MessageHandler(Filters.regex('К мастеру'), booking_method_2),
+                    MessageHandler(Filters.regex('На услугу'), booking_method_3),
+                ],
+                "booking_master": [MessageHandler(Filters.text, booking_method_choice)],
+            },
             fallbacks=[]
         )
         dp.add_handler(booking)
