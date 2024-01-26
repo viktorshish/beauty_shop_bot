@@ -38,7 +38,7 @@ class TimeSlot(models.Model):
     )
 
     def __str__(self):
-        return f"{self.start_time.hour} - {self.end_time.hour}, {self.salon.address}"
+        return f"{self.start_time.day}:{self.start_time.month} - {self.start_time.hour} - {self.end_time.hour}, {self.salon.address}"
 
     class Meta:
         verbose_name = 'Смены'
