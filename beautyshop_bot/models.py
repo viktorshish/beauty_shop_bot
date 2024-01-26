@@ -113,11 +113,11 @@ class Client(models.Model):
     )
     telegram_chat_id = models.CharField(
         max_length=30,
-        verbose_name="Телеграмм",
+        verbose_name="Телеграмм ID",
     )
     telegram_nickname = models.CharField(
         max_length=30,
-        verbose_name="Ник в телеграме",
+        verbose_name="Имя в телеграме",
     )
 
     def __str__(self):
@@ -139,6 +139,12 @@ class Order(models.Model):
         Master,
         on_delete=models.CASCADE,
         verbose_name="Мастер",
+        related_name="orders",
+    )
+    salon = models.ForeignKey(
+        Salon,
+        on_delete=models.CASCADE,
+        verbose_name="Салон",
         related_name="orders",
     )
     order_time = models.DateTimeField(
