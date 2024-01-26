@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from .bot_handlers import greet_user, show_contacts, show_my_orders
+from .bot_handlers import greet_user, show_contacts, show_my_orders, show_speciality
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +23,8 @@ class Command(BaseCommand):
         dp.add_handler(MessageHandler(Filters.regex('^(Контакты)$'), show_contacts))
 
         dp.add_handler(MessageHandler(Filters.regex('^(Мои записи)$'), show_my_orders))
+
+        dp.add_handler(MessageHandler(Filters.regex('^(Услуги)$'), show_speciality))
 
         logger.info('Бот запущен')
         updater.start_polling()

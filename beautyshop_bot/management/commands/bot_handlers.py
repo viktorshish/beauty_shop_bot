@@ -1,6 +1,6 @@
 from .bot_utils import main_keyboard
 
-from .db_utils import get_salon_contacts, get_client_orders
+from .db_utils import get_salon_contacts, get_client_orders, get_speciality
 
 
 def greet_user(update, context):
@@ -40,3 +40,13 @@ def show_my_orders(update, context):
     update.message.reply_text(message, reply_markup=main_keyboard())
 
 
+def show_speciality(update, contex):
+    specialitys_salon = get_speciality()
+
+    message = f"У нас представлены следующие услуги:\n\n"
+    for speciality in specialitys_salon:
+        message += f"Услуга: {speciality['name']}\n"
+        message += f"Описание: {speciality['description']}\n"
+        message += f"\n"
+
+    update.message.reply_text(message, reply_markup=main_keyboard())

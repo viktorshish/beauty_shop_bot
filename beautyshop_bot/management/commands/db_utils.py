@@ -1,4 +1,4 @@
-from beautyshop_bot.models import Salon, Order, Client
+from beautyshop_bot.models import Salon, Order, Client, Speciality
 
 
 def get_salon_contacts():
@@ -26,3 +26,15 @@ def get_client_orders(chat_id):
         for order in orders
     ]
     return my_orders
+
+
+def get_speciality():
+    specialitys = Speciality.objects.all()
+    specialitys_salon = [
+        {
+            "name": speciality.name,
+            "description": speciality.description
+        }
+        for speciality in specialitys
+    ]
+    return specialitys_salon
