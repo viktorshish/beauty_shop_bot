@@ -1,6 +1,6 @@
 from .bot_utils import main_keyboard
 
-from .db_utils import get_salon_contacts, get_client_orders, get_speciality
+from beautyshop_bot.db_utils import get_salon_contacts, get_client_orders, get_speciality
 
 
 def greet_user(update, context):
