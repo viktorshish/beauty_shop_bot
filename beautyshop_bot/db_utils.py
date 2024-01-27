@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from beautyshop_bot.models import Salon, Master, Speciality, Order, Client
+import zoneinfo
 
 
 def get_salon_contacts():
@@ -18,6 +19,10 @@ def get_salon_contacts():
 
 def get_masters():
     masters = Master.objects.all()
+    # if not date_time:
+    #     masters = Master.objects.all()
+    # else:
+    #     masters = Master.objects.filter()
     result = [
         {
             "name": master.name,
@@ -31,12 +36,18 @@ def get_masters():
     return result
 
   
-def get_master_and_timeslots(master_name):
+def get_master_and_timeslots(master_name, date_time=None):
     master = Master.objects.filter(name=master_name).first()
     # print(master)
-    orders_for_master = Order.objects.filter(
-        master=master,
-    )
+    if date_time:
+        orders_for_master = Order.objects.filter(
+            master=master,
+            order_time=date_time,
+        )
+    else:
+        orders_for_master = Order.objects.filter(
+            master=master,
+        )
     # print(orders_for_master)
     occupied_hours = [ ts.order_time for ts in orders_for_master]
 
@@ -52,6 +63,37 @@ def get_master_and_timeslots(master_name):
         ))
     return hours
 
+
+def get_free_masters(date_time):
+    masters = get_masters()
+    necessary_date = datetime.strptime(date_time, "%d/%m - %H")
+    necessary_date = necessary_date.\
+        replace(year=datetime.now().year).\
+        replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+
+    print(type(necessary_date))
+    print(necessary_date)
+    available_masters = []
+    for master in masters:
+        # available_masters[master] = available_masters.get(master, [])
+        time_slots = get_master_and_timeslots(master["name"])
+        print(time_slots)
+        for salon, slots in time_slots.items():
+            print(slots[0])
+            if necessary_date in slots:
+                available_masters.append(
+                    {
+                        "name": master["name"],
+                        "surname": master["surname"],
+                        "specialities": master["specialities"],
+                        "salon": salon,
+                    }
+                )
+    print(available_masters)
+    return available_masters
+
+
+
   
 def make_order(order_data):
     # TODO: finish client creation
@@ -62,15 +104,17 @@ def make_order(order_data):
         telegram_chat_id="test",
         telegram_nickname="test",
     )
-    print(client)
+    # print(client)
     master = Master.objects.filter(name=order_data['master_name']).first()
-    print(master)
+    # print(master)
     order = Order.objects.get_or_create(
         customer=client[0],
         master=master,
-        order_time=datetime.strptime(order_data['date'], "%d/%m - %H"),
+        order_time=datetime.strptime(order_data['date'].split(':')[1].strip(), "%d/%m - %H").
+            replace(year=datetime.now().year).
+            replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow")),
     )
-    print(order)
+    # print(order)
     return order
 
   
@@ -86,3 +130,10 @@ def get_client_orders(chat_id):
         for order in orders
     ]
     return my_orders
+
+
+def get_dates():
+    cur_date = datetime.now()
+    return [
+        cur_date + timedelta(days=i) for i in range(30)
+    ]

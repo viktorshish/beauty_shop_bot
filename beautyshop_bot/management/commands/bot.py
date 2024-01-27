@@ -4,7 +4,9 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
 
-from .bot_booking import booking_start, booking_surname, booking_method_choice, booking_method_1, booking_method_2, booking_method_3, booking_master, create_order
+from .bot_booking import booking_start, booking_surname, booking_method_choice, \
+    booking_method_1, booking_method_2, booking_method_3, \
+    booking_master, create_order, booking_date, booking_time
 from .bot_handlers import greet_user, show_contacts, show_my_orders
 
 
@@ -28,15 +30,21 @@ class Command(BaseCommand):
                 MessageHandler(Filters.regex('^(Хочу записаться)$'), booking_start)
             ],
             states={
+                # "start": [MessageHandler(Filters.text, greet_user)],
                 "name": [MessageHandler(Filters.text, booking_surname)],
                 "surname": [MessageHandler(Filters.text, booking_method_choice)],
                 "method_choice": [MessageHandler(Filters.text, booking_method_choice)],
                 "booking": [
                     MessageHandler(Filters.regex('В салон'), booking_method_1),
                     MessageHandler(Filters.regex('К мастеру'), booking_method_2),
-                    MessageHandler(Filters.regex('На услугу'), booking_method_3),
+                    MessageHandler(Filters.regex('На время'), booking_method_3),
                 ],
                 "booking_master": [MessageHandler(Filters.text, booking_master)],
+
+                "booking_date": [MessageHandler(Filters.text, booking_date)],
+                "booking_time": [MessageHandler(Filters.text, booking_time)],
+                # "prepare_order_time": [MessageHandler(Filters.text, prepare_order_time)],
+
                 "order": [MessageHandler(Filters.text, create_order)],
             },
             fallbacks=[]
