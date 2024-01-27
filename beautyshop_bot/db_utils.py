@@ -55,11 +55,11 @@ def get_master_and_timeslots(master_name, date_time=None):
     occupied_hours = [ ts.order_time for ts in orders_for_master]
 
     # print(occupied_hours)
-    print(today_date)
+    # print(today_date)
     available_time_slots = master.working_hours.all()
-    print(available_time_slots)
+    # print(available_time_slots)
     available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
-    print(available_time_slots)
+    # print(available_time_slots)
     # print(available_time_slots)
     hours = {}
     for ts in available_time_slots:
@@ -78,15 +78,15 @@ def get_free_masters(date_time):
         replace(year=datetime.now().year).\
         replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
 
-    print(type(necessary_date))
-    print(necessary_date)
+    # print(type(necessary_date))
+    # print(necessary_date)
     available_masters = []
     for master in masters:
         # available_masters[master] = available_masters.get(master, [])
         time_slots = get_master_and_timeslots(master["name"])
-        print(time_slots)
+        # print(time_slots)
         for salon, slots in time_slots.items():
-            print(slots[0])
+            # print(slots[0])
             if necessary_date in slots:
                 available_masters.append(
                     {
@@ -96,7 +96,7 @@ def get_free_masters(date_time):
                         "salon": salon,
                     }
                 )
-    print(available_masters)
+    # print(available_masters)
     return available_masters
 
 

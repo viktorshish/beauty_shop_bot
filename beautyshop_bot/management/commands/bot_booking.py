@@ -114,7 +114,7 @@ def create_order(update, context):
         context.user_data["order"]["date"] = order_date
     elif context.user_data["order_type"] == "time":
         master = update.message.text
-        print(master)
+        # print(master)
         context.user_data["order"]["master"] = master
 
 
@@ -130,7 +130,7 @@ def create_order(update, context):
         "master_name": context.user_data["order"]["master"],
         "date": context.user_data["order"]["date"],
     }
-    print(order)
+    # print(order)
     order_confirmation = make_order(order)
     if order_confirmation:
         update.message.reply_text("Спасибо за заказ!", reply_markup=main_keyboard())
@@ -143,7 +143,7 @@ def create_order(update, context):
 
 
 def booking_method_3(update, context):
-    print("Method 3", update.message.text)
+    # print("Method 3", update.message.text)
     # print("Method 2", update.message.text)
     context.user_data["order_type"] = "time"
 
@@ -178,7 +178,7 @@ def booking_date(update, context):
 def booking_time(update, context):
     order_time = update.message.text.split(":")[0]
     order_date = context.user_data["order"]["date"] + f" - {order_time}"
-    print(order_date)
+    # print(order_date)
     context.user_data["order"]["date"] = order_date
 
     masters = get_free_masters(order_date)
