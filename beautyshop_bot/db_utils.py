@@ -19,10 +19,6 @@ def get_salon_contacts():
 
 def get_masters():
     masters = Master.objects.all()
-    # if not date_time:
-    #     masters = Master.objects.all()
-    # else:
-    #     masters = Master.objects.filter()
     result = [
         {
             "name": master.name,
@@ -38,7 +34,6 @@ def get_masters():
   
 def get_master_and_timeslots(master_name, date_time=None):
     master = Master.objects.filter(name=master_name).first()
-    # print(master)
     if date_time:
         orders_for_master = Order.objects.filter(
             master=master,
@@ -48,22 +43,14 @@ def get_master_and_timeslots(master_name, date_time=None):
         orders_for_master = Order.objects.filter(
             master=master,
         )
-    # print(orders_for_master)
     today_date = datetime.today().\
         replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
 
     occupied_hours = [ ts.order_time for ts in orders_for_master]
 
-    # print(occupied_hours)
-    # print(today_date)
-    available_time_slots = master.working_hours.all()
-    # print(available_time_slots)
     available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
-    # print(available_time_slots)
-    # print(available_time_slots)
     hours = {}
     for ts in available_time_slots:
-        # print(ts.salon.name, hours.get(ts.salon.name, []).append(1) )
         hours[ts.salon.name] = hours.get(ts.salon.name, [])
         hours[ts.salon.name].extend(list(
             ts.start_time + timedelta(hours=i) for i in range(0, (ts.end_time.hour - ts.start_time.hour)) if ts.start_time + timedelta(hours=i) not in occupied_hours
@@ -78,15 +65,10 @@ def get_free_masters(date_time):
         replace(year=datetime.now().year).\
         replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
 
-    # print(type(necessary_date))
-    # print(necessary_date)
     available_masters = []
     for master in masters:
-        # available_masters[master] = available_masters.get(master, [])
         time_slots = get_master_and_timeslots(master["name"])
-        # print(time_slots)
         for salon, slots in time_slots.items():
-            # print(slots[0])
             if necessary_date in slots:
                 available_masters.append(
                     {
@@ -96,7 +78,6 @@ def get_free_masters(date_time):
                         "salon": salon,
                     }
                 )
-    # print(available_masters)
     return available_masters
 
 

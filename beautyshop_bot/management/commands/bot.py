@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler
 
 from .bot_booking import booking_start, booking_surname, booking_method_choice, \
     booking_method_1, booking_method_2, booking_method_3, \
@@ -42,9 +42,9 @@ class Command(BaseCommand):
                 ],
                 "booking_master": [MessageHandler(Filters.text, booking_master)],
 
-                "booking_date": [MessageHandler(Filters.text, booking_date)],
-                "booking_time": [MessageHandler(Filters.text, booking_time)],
-                # "prepare_order_time": [MessageHandler(Filters.text, prepare_order_time)],
+                "booking_date": [CallbackQueryHandler(booking_date, pattern="^(date|)")],
+                "booking_time": [CallbackQueryHandler(booking_time, pattern="^(time|)" )],
+
 
                 "order": [MessageHandler(Filters.text, create_order)],
             },

@@ -1,8 +1,6 @@
-from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from .bot_utils import method_keyboard, main_keyboard
 from beautyshop_bot.db_utils import get_masters, get_master_and_timeslots, make_order, get_dates, get_free_masters, check_if_user_exists
-
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
 
 def booking_start(update, context):
@@ -102,12 +100,6 @@ def booking_master(update, context):
     return "order"
 
 
-# def prepare_order_master(update, context):
-#     order_date = update.message.text
-#     context.user_data["order"]["date"] = order_date
-#
-#     return "order"
-
 def create_order(update, context):
     if context.user_data["order_type"] == "master":
         order_date = update.message.text.split(':')[1].strip()
@@ -140,43 +132,65 @@ def create_order(update, context):
         return -1
 
 
-
-
 def booking_method_3(update, context):
     # print("Method 3", update.message.text)
     # print("Method 2", update.message.text)
     context.user_data["order_type"] = "time"
 
     dates = get_dates()
-    reply_keyboard = [[ f"{date.day}/{date.month}" ] for date in dates]
 
-    # calendar, step = DetailedTelegramCalendar().build()
-    # update.message.reply_text(
-    #     f"Select {LSTEP[step]}",
-    #     reply_markup=calendar
-    # )
+    inline_keyboard = [
+        [
+            InlineKeyboardButton(f"{dates[i + j].day}/{dates[i + j].month}",
+                                 callback_data=f"date|{dates[i + j].day}/{dates[i + j].month}")
+            for j in range(0, 5)
+        ]
+        for i in range(0, len(dates), 5)
+    ]
+
+    # reply_keyboard = [[ f"{date.day}/{date.month}" ] for date in dates]
+
+
     update.message.reply_text(
         "Выберите дату для записи:",
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
-    )
+        reply_markup=InlineKeyboardMarkup(
+                inline_keyboard
+            )
+        )
+
     return "booking_date"
 
 def booking_date(update, context):
+    update.callback_query.answer()
 
-    # print(update.callback_query.answer())
-
-    order_date = update.message.text
+    order_date = update.callback_query.data.split("|")[-1]
     context.user_data["order"]["date"] = order_date
-    reply_keyboard = [[ f"{hour}:00" ] for hour in range(8, 21)]
-    update.message.reply_text(
+    # reply_keyboard = [[ f"{hour + i}:00" for i in range(4) ] for hour in range(8, 21, 4)]
+    inline_keyboard = [
+        [
+            InlineKeyboardButton(f"{hour + i}:00",
+                                 callback_data=f"time|{hour + i}:00")
+            for i in range(0, 5)
+        ]
+        for hour in range(8, 21, 4)
+    ]
+
+    update.callback_query.message.edit_text(
         "Выберите время для записи:",
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        # reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard
+        )
     )
     return "booking_time"
 
 
 def booking_time(update, context):
-    order_time = update.message.text.split(":")[0]
+    update.callback_query.answer()
+    order_time = update.callback_query.data.split("|")[-1].split(":")[0]
+    # context.user_data["order"]["date"] = order_date
+
+    # order_time = update.message.text.split(":")[0]
     order_date = context.user_data["order"]["date"] + f" - {order_time}"
     # print(order_date)
     context.user_data["order"]["date"] = order_date
@@ -185,25 +199,19 @@ def booking_time(update, context):
     answer_message = f"Будут свободны следующие мастера:\n\n"
     if not masters:
         answer_message += f"К сожалению, все мастера на это время заняты"
-        update.message.reply_text(answer_message, reply_markup=main_keyboard())
+        update.effective_chat.send_message(answer_message, reply_markup=main_keyboard())
         return -1
     for master in masters:
         answer_message += f"{master['name']} {master['surname']}\n"
         answer_message += f"Услуги: {master['specialities']}\n"
         answer_message += f"В салоне: {master['salon']}\n"
         answer_message += f"\n"
-    update.message.reply_text(answer_message)
+    update.effective_chat.send_message(answer_message)
 
     reply_keyboard = [[f"{master['name']}"] for master in masters]
-    update.message.reply_text(
+    update.effective_chat.send_message(
         "Выберите мастера",
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
     )
     return "order"
 
-# def prepare_order_time(update, context):
-#     master = update.message.text
-#     print(master)
-#     context.user_data["order"]["master"] = master
-#
-#     return "order"
