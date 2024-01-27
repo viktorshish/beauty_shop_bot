@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
+import zoneinfo
 
 from beautyshop_bot.models import Salon, Master, Speciality, Order, Client
-import zoneinfo
 
 
 def get_salon_contacts():
@@ -81,8 +81,6 @@ def get_free_masters(date_time):
     return available_masters
 
 
-
-  
 def make_order(order_data):
     client = Client.objects.get_or_create(
         name=order_data['client_name'],
@@ -103,6 +101,7 @@ def make_order(order_data):
     )
     # print(order)
     return order
+
 
 def check_if_user_exists(chat_id):
     client = Client.objects.filter(telegram_chat_id=chat_id).first()
@@ -136,3 +135,15 @@ def get_dates():
     return [
         cur_date + timedelta(days=i) for i in range(30)
     ]
+
+  
+def get_speciality():
+    specialitys = Speciality.objects.all()
+    specialitys_salon = [
+        {
+            "name": speciality.name,
+            "description": speciality.description
+        }
+        for speciality in specialitys
+    ]
+    return specialitys_salon
