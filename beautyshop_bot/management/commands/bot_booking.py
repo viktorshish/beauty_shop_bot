@@ -1,9 +1,25 @@
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup
 from .bot_utils import method_keyboard, main_keyboard
-from beautyshop_bot.db_utils import get_masters, get_master_and_timeslots, make_order, get_dates, get_free_masters
+from beautyshop_bot.db_utils import get_masters, get_master_and_timeslots, make_order, get_dates, get_free_masters, check_if_user_exists
+
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
 
 def booking_start(update, context):
+    chat_id = update.message.chat_id
+    client = check_if_user_exists(chat_id)
+    if client:
+        context.user_data["order"] = {
+            "name": client["client_name"],
+            "surname": client["client_surname"],
+            "phone": client["phone"],
+            "telegram_chat_id": client["telegram_chat_id"],
+            "telegram_nickname": client["telegram_nickname"],
+        }
+        message = 'Выберите способ записи'
+        update.message.reply_text(message, reply_markup=method_keyboard())
+        return "booking"
+
     update.message.reply_text(
         "Как вас зовут? Напишите имя",
         reply_markup=ReplyKeyboardRemove()
@@ -21,8 +37,20 @@ def booking_surname(update, context):
     return "surname"
 
 
-def booking_method_choice(update, context):
+def booking_phone(update, context):
     context.user_data["order"]["surname"] = update.message.text
+
+    update.message.reply_text(
+        "Напишите телефон",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return "phone"
+
+
+def booking_method_choice(update, context):
+    context.user_data["order"]["phone"] = update.message.text
+    context.user_data["order"]["telegram_nickname"] = update.message.from_user['username']
+    context.user_data["order"]["telegram_chat_id"] = update.message.from_user['id']
 
     message = 'Выберите способ записи'
     update.message.reply_text(message, reply_markup=method_keyboard())
@@ -94,6 +122,11 @@ def create_order(update, context):
     order = {
         "client_name": context.user_data["order"]["name"],
         "client_surname": context.user_data["order"]["surname"],
+
+        "phone": context.user_data["order"]["phone"],
+        "telegram_chat_id": context.user_data["order"]["telegram_chat_id"],
+        "telegram_nickname": context.user_data["order"]["telegram_nickname"],
+
         "master_name": context.user_data["order"]["master"],
         "date": context.user_data["order"]["date"],
     }
@@ -116,6 +149,12 @@ def booking_method_3(update, context):
 
     dates = get_dates()
     reply_keyboard = [[ f"{date.day}/{date.month}" ] for date in dates]
+
+    # calendar, step = DetailedTelegramCalendar().build()
+    # update.message.reply_text(
+    #     f"Select {LSTEP[step]}",
+    #     reply_markup=calendar
+    # )
     update.message.reply_text(
         "Выберите дату для записи:",
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
@@ -123,6 +162,9 @@ def booking_method_3(update, context):
     return "booking_date"
 
 def booking_date(update, context):
+
+    print(update.callback_query.answer())
+
     order_date = update.message.text
     context.user_data["order"]["date"] = order_date
     reply_keyboard = [[ f"{hour}:00" ] for hour in range(8, 21)]

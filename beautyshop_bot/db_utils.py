@@ -49,10 +49,17 @@ def get_master_and_timeslots(master_name, date_time=None):
             master=master,
         )
     # print(orders_for_master)
+    today_date = datetime.today().\
+        replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+
     occupied_hours = [ ts.order_time for ts in orders_for_master]
 
     # print(occupied_hours)
+    print(today_date)
     available_time_slots = master.working_hours.all()
+    print(available_time_slots)
+    available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
+    print(available_time_slots)
     # print(available_time_slots)
     hours = {}
     for ts in available_time_slots:
@@ -96,13 +103,12 @@ def get_free_masters(date_time):
 
   
 def make_order(order_data):
-    # TODO: finish client creation
     client = Client.objects.get_or_create(
         name=order_data['client_name'],
         surname=order_data['client_surname'],
-        phone="test",
-        telegram_chat_id="test",
-        telegram_nickname="test",
+        phone=order_data["phone"],
+        telegram_chat_id=order_data["telegram_chat_id"],
+        telegram_nickname=order_data["telegram_nickname"],
     )
     # print(client)
     master = Master.objects.filter(name=order_data['master_name']).first()
@@ -116,6 +122,18 @@ def make_order(order_data):
     )
     # print(order)
     return order
+
+def check_if_user_exists(chat_id):
+    client = Client.objects.filter(telegram_chat_id=chat_id).first()
+    if client:
+        return {
+            "client_name": client.name,
+            "client_surname": client.surname,
+            "phone": client.phone,
+            "telegram_chat_id": client.telegram_chat_id,
+            "telegram_nickname": client.telegram_nickname,
+        }
+    return False
 
   
 def get_client_orders(chat_id):

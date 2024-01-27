@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 
 from .bot_booking import booking_start, booking_surname, booking_method_choice, \
     booking_method_1, booking_method_2, booking_method_3, \
-    booking_master, create_order, booking_date, booking_time
+    booking_master, create_order, booking_date, booking_time, booking_phone
 from .bot_handlers import greet_user, show_contacts, show_my_orders
 
 
@@ -32,7 +32,8 @@ class Command(BaseCommand):
             states={
                 # "start": [MessageHandler(Filters.text, greet_user)],
                 "name": [MessageHandler(Filters.text, booking_surname)],
-                "surname": [MessageHandler(Filters.text, booking_method_choice)],
+                "surname": [MessageHandler(Filters.text, booking_phone)],
+                "phone": [MessageHandler(Filters.text, booking_method_choice)],
                 "method_choice": [MessageHandler(Filters.text, booking_method_choice)],
                 "booking": [
                     MessageHandler(Filters.regex('В салон'), booking_method_1),
