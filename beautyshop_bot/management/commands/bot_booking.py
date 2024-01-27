@@ -110,7 +110,7 @@ def booking_master(update, context):
 
 def create_order(update, context):
     if context.user_data["order_type"] == "master":
-        order_date = update.message.text
+        order_date = update.message.text.split(':')[1].strip()
         context.user_data["order"]["date"] = order_date
     elif context.user_data["order_type"] == "time":
         master = update.message.text
@@ -163,7 +163,7 @@ def booking_method_3(update, context):
 
 def booking_date(update, context):
 
-    print(update.callback_query.answer())
+    # print(update.callback_query.answer())
 
     order_date = update.message.text
     context.user_data["order"]["date"] = order_date
@@ -183,6 +183,10 @@ def booking_time(update, context):
 
     masters = get_free_masters(order_date)
     answer_message = f"Будут свободны следующие мастера:\n\n"
+    if not masters:
+        answer_message += f"К сожалению, все мастера на это время заняты"
+        update.message.reply_text(answer_message, reply_markup=main_keyboard())
+        return -1
     for master in masters:
         answer_message += f"{master['name']} {master['surname']}\n"
         answer_message += f"Услуги: {master['specialities']}\n"

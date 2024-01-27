@@ -116,7 +116,7 @@ def make_order(order_data):
     order = Order.objects.get_or_create(
         customer=client[0],
         master=master,
-        order_time=datetime.strptime(order_data['date'].split(':')[1].strip(), "%d/%m - %H").
+        order_time=datetime.strptime(order_data['date'], "%d/%m - %H").
             replace(year=datetime.now().year).
             replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow")),
     )
