@@ -1,6 +1,6 @@
-from beautyshop_bot.models import Salon, Master, Speciality, Order, Client
-
 from datetime import datetime, timedelta
+
+from beautyshop_bot.models import Salon, Master, Speciality, Order, Client
 
 
 def get_salon_contacts():
@@ -30,6 +30,7 @@ def get_masters():
     ]
     return result
 
+  
 def get_master_and_timeslots(master_name):
     master = Master.objects.filter(name=master_name).first()
     # print(master)
@@ -51,6 +52,7 @@ def get_master_and_timeslots(master_name):
         ))
     return hours
 
+  
 def make_order(order_data):
     # TODO: finish client creation
     client = Client.objects.get_or_create(
@@ -70,3 +72,17 @@ def make_order(order_data):
     )
     print(order)
     return order
+
+  
+def get_client_orders(chat_id):
+    client = Client.objects.get(telegram_chat_id=chat_id)
+    orders = Order.objects.filter(customer=client)
+    my_orders = [
+        {
+            'speciality': order.speciality,
+            'master': order.master,
+            'time': order.order_time
+        }
+        for order in orders
+    ]
+    return my_orders
