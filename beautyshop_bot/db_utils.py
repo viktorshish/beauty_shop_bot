@@ -73,7 +73,7 @@ def make_order(order_data):
     print(order)
     return order
 
-  
+
 def get_client_orders(chat_id):
     client = Client.objects.get(telegram_chat_id=chat_id)
     orders = Order.objects.filter(customer=client)
@@ -86,3 +86,15 @@ def get_client_orders(chat_id):
         for order in orders
     ]
     return my_orders
+
+
+def get_speciality():
+    specialitys = Speciality.objects.all()
+    specialitys_salon = [
+        {
+            "name": speciality.name,
+            "description": speciality.description
+        }
+        for speciality in specialitys
+    ]
+    return specialitys_salon
