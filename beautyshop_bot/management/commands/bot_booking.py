@@ -89,9 +89,16 @@ def booking_master(update, context):
     for salon, slots in timeslots.items():
         answer_message += f"В салон {salon}\n"
         # print(slots)
-        for ts in slots:
-            answer_message += f"{ts.day}/{ts.month} - {ts.hour}\n"
-            keyboard.append([f"{salon}: {ts.day}/{ts.month} - {ts.hour}"])
+        temp_keyboard = []
+        for count, ts in enumerate(slots):
+            answer_message += f"{ts.day}/{ts.month} - {ts.hour} часов\t"
+            temp_keyboard.append(f"{salon}: {ts.day}/{ts.month} - {ts.hour} часов")
+            if count % 4 == 0:
+                answer_message += "\n"
+            if count % 2 == 0:
+                keyboard.append(temp_keyboard)
+                temp_keyboard = []
+    # print(keyboard)
 
     update.message.reply_text(
         answer_message,
@@ -102,7 +109,7 @@ def booking_master(update, context):
 
 def create_order(update, context):
     if context.user_data["order_type"] == "master":
-        order_date = update.message.text.split(':')[1].strip()
+        order_date = update.message.text.split(':')[1].strip("часов").strip()
         context.user_data["order"]["date"] = order_date
     elif context.user_data["order_type"] == "time":
         master = update.message.text
