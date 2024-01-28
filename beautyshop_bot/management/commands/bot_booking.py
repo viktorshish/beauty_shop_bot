@@ -169,7 +169,7 @@ def booking_method_3(update, context):
     return "booking_date"
 
 def booking_method_4(update, context):
-        update.message.reply_text("Для записи , позвоните на номер нашему администратору 4143", reply_markup=main_keyboard())
+        update.message.reply_text("Для записи , позвоните на номер нашему администратору 📱📱📱 214143", reply_markup=main_keyboard())
 
 def booking_date(update, context):
     update.callback_query.answer()
