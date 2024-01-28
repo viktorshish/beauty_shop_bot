@@ -14,6 +14,14 @@ class Salon(models.Model):
         max_length=30,
         verbose_name="Телефон салона",
     )
+    longitude = models.FloatField(
+        verbose_name="Долгота",
+        null=True,
+    )
+    latitude = models.FloatField(
+        verbose_name="Широта",
+        null=True,
+    )
 
     def __str__(self):
         return f"{self.name} - {self.address} - {self.phone}"

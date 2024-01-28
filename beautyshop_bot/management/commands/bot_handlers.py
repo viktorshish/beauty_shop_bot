@@ -50,3 +50,4 @@ def show_speciality(update, contex):
         message += f"\n"
 
     update.message.reply_text(message, reply_markup=main_keyboard())
+

@@ -17,6 +17,33 @@ def get_salon_contacts():
     return contacts
 
 
+def get_distance(a_lon, a_lat, b_lon, b_lat):
+    return ((a_lon - b_lon)**2 + (a_lat - b_lat)**2)**(1/2)
+
+def get_closest_salon(coordinates):
+    salons = Salon.objects.all()
+    closest_salon = salons.first()
+    min_distance = get_distance(
+        coordinates["longitude"],
+        coordinates["latitude"],
+        closest_salon.longitude,
+        closest_salon.latitude,
+    )
+    for salon in salons:
+        distance = get_distance(
+            coordinates["longitude"],
+            coordinates["latitude"],
+            salon.longitude,
+            salon.latitude,
+        )
+        if distance < min_distance:
+            closest_salon = salon
+            min_distance = distance
+
+    return closest_salon
+
+
+
 def get_masters():
     masters = Master.objects.all()
     result = [
@@ -30,6 +57,46 @@ def get_masters():
         for master in masters
     ]
     return result
+
+
+def get_masters_by_salon(salon_name):
+    masters = Master.objects.all()
+    result = []
+    for master in masters:
+        # timeslots = master.working_hours
+
+        orders_for_master = Order.objects.filter(
+            master=master,
+        )
+        occupied_hours = [ts.order_time for ts in orders_for_master]
+        today_date = datetime.today(). \
+            replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
+        available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
+
+        for ts in available_time_slots:
+            print(ts)
+            if ts.salon.name == salon_name:
+                result.append(
+                    {
+                        "name": master.name,
+                        "surname": master.surname,
+                        "specialities": [
+                            sp.name for sp in master.speciality.all()
+                        ]
+                    }
+                )
+                break
+                # result[master.name] = master.speciality # result.get(master.name, [])
+                # result[master.name].extend(
+                #     list(
+                #         ts.start_time + timedelta(hours=i) for i in range(0, (ts.end_time.hour - ts.start_time.hour)) if
+                #         ts.start_time + timedelta(hours=i) not in occupied_hours
+                #     )
+                # )
+    print(result)
+
+    return result
+
 
   
 def get_master_and_timeslots(master_name, date_time=None):
