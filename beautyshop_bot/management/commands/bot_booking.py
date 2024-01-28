@@ -1,6 +1,7 @@
 from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from .bot_utils import method_keyboard, main_keyboard
-from beautyshop_bot.db_utils import get_masters, get_master_and_timeslots, make_order, get_dates, get_free_masters, check_if_user_exists
+from beautyshop_bot.db_utils import get_masters, get_master_and_timeslots, make_order, get_dates, get_free_masters, \
+    check_if_user_exists, get_salon_contacts, get_closest_salon, get_masters_by_salon
 
 
 def booking_start(update, context):
@@ -56,6 +57,92 @@ def booking_method_choice(update, context):
 
 def booking_method_1(update, context):
     print("Method 1", update.message.text)
+    context.user_data["order_type"] = "salon"
+    contacts = get_salon_contacts()
+
+    answer_message = f"У нас есть следующие салоны:\n\n"
+    for salon in contacts:
+        answer_message += f"Салон: {salon['name']}\n"
+        answer_message += f"Адрес: {salon['address']}\n"
+        answer_message += f"Телефон: {salon['phone']}\n"
+        answer_message += f"\n"
+    reply_keyboard = [[f"{salon['name']}"] for salon in contacts]
+
+    answer_message += "Мы так же можем порекомендовать Вам близжайши салон, если вы поделитесь своей геолокацией"
+
+    update.message.reply_text(answer_message)
+
+    update.message.reply_text(
+        "Выберите салон",
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    )
+    return "chose_salon"
+
+def booking_gave_location(update, context):
+    if update.message.location:
+        context.user_data["location"] = update.message.location
+
+        closest_salon = get_closest_salon(update.message.location)
+        context.user_data["order"]["salon"] = closest_salon.name
+        update.message.reply_text(f"Близжайший салон - {closest_salon.name}, по адресу {closest_salon.address}")
+    else:
+        context.user_data["order"]["salon"] = update.message.text
+
+    # print("Gave location function")
+    # print(context.user_data["order"]["salon"])
+    masters = get_masters_by_salon(context.user_data["order"]["salon"])
+    print(masters)
+
+
+    # keyboard = []
+    answer_message = "В этом салоне работают следующие мастера\n"
+
+    for master in masters:
+        answer_message += f"{master['name']} {master['surname']}\n"
+        answer_message += f"Услуги: {master['specialities']}\n"
+        answer_message += f"\n"
+
+    update.message.reply_text(answer_message)
+    # reply_keyboard = [["1", "2", "3", "4", "5"]]
+    reply_keyboard = [[f"{master['name']}"] for master in masters]
+    update.message.reply_text(
+        "Выберите мастера",
+        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+    )
+
+    return "chose_master"
+
+
+def booking_get_dates_for_salon(update, context):
+    master_name = update.message.text
+    context.user_data["order"]["master"] = master_name
+    timeslots = get_master_and_timeslots(master_name)
+
+    update.message.reply_text(f"Для мастера {master_name} есть следующие записи:")
+    keyboard = []
+    # print(timeslots)
+    answer_message = ""
+    for salon, slots in timeslots.items():
+        if salon == context.user_data["order"]["salon"]:
+            # answer_message += f"В салон {salon}\n"
+            # print(slots)
+            temp_keyboard = []
+            for count, ts in enumerate(slots):
+                answer_message += f"{ts.day}/{ts.month} - {ts.hour} часов\n"
+                temp_keyboard.append(f"{salon}: {ts.day}/{ts.month} - {ts.hour} часов")
+                # if count % 4 == 0:
+                #     answer_message += "\n"
+                if count % 2 == 0 or count >= len(slots) - 1:
+                    keyboard.append(temp_keyboard)
+                    temp_keyboard = []
+    # print(keyboard)
+
+    update.message.reply_text(
+        answer_message,
+        reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
+    )
+    return "order"
+
 
 
 def booking_method_2(update, context):
@@ -70,7 +157,7 @@ def booking_method_2(update, context):
 
     update.message.reply_text(answer_message)
     # reply_keyboard = [["1", "2", "3", "4", "5"]]
-    reply_keyboard = [[f"{master['name']}" for master in masters]]
+    reply_keyboard = [[f"{master['name']}"] for master in masters]
     update.message.reply_text(
         "Выберите мастера",
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
@@ -87,6 +174,7 @@ def booking_master(update, context):
     keyboard = []
     # print(timeslots)
     answer_message = ""
+    temp_keyboard = []
     for salon, slots in timeslots.items():
         answer_message += f"В салон {salon}\n"
         # print(slots)
@@ -96,9 +184,10 @@ def booking_master(update, context):
             temp_keyboard.append(f"{salon}: {ts.day}/{ts.month} - {ts.hour} часов")
             if count % 4 == 0:
                 answer_message += "\n"
-            if count % 2 == 0:
+            if count % 2 == 0 or count >= len(slots) - 1:
                 keyboard.append(temp_keyboard)
                 temp_keyboard = []
+
     # print(keyboard)
 
     update.message.reply_text(
@@ -116,6 +205,10 @@ def create_order(update, context):
         master = update.message.text
         # print(master)
         context.user_data["order"]["master"] = master
+    elif context.user_data["order_type"] == "salon":
+        order_date = update.message.text.split(':')[1].strip("часов").strip()
+        # print(master)
+        context.user_data["order"]["date"] = order_date
 
 
 
