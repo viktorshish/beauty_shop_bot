@@ -15,12 +15,12 @@ def welcome_pdf_user(update, context):
     chat_id = update.effective_chat.id
     with open('static/test.pdf', 'rb') as pdf_file:
         context.bot.send_document(chat_id=chat_id, document=pdf_file)
-    welcome_message = 'Приветствуем в нашем боте. Перед использованием необходимо принять согласие на обработку ПД'
-    update.message.reply_text(welcome_message, reply_markup=personal_data_keyboard())
+   welcome_pdf_message = 'Приветствуем в нашем боте. Перед использованием необходимо принять согласие на обработку ПД'
+    update.message.reply_text(welcome_pdf_message, reply_markup=personal_data_keyboard())
 
 def not_accept_personal_data(update, context):
-    welcome_message = 'Извините без принятого согласия невозможно продолжить работу'
-    update.message.reply_text(welcome_message, reply_markup=personal_data_keyboard())
+    welcome_pdf_message = 'Извините без принятого согласия невозможно продолжить работу'
+    update.message.reply_text(welcome_pdf_message, reply_markup=personal_data_keyboard())
 
 def show_contacts(update, contex):
     contacts = get_salon_contacts()
