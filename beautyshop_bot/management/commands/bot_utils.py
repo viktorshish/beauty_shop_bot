@@ -10,7 +10,8 @@ def main_keyboard():
 
 def method_keyboard():
     return ReplyKeyboardMarkup([
-        ['В салон', 'К мастеру', 'На время', 'По номеру телефона'],
+        ['В салон', 'К мастеру'],
+        ['На время', 'По номеру телефона'],
     ], resize_keyboard=True)
 
 
