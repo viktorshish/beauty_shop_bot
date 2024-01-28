@@ -57,6 +57,7 @@ def booking_method_choice(update, context):
 def booking_method_1(update, context):
     print("Method 1", update.message.text)
 
+
 def booking_method_2(update, context):
     # print("Method 2", update.message.text)
     context.user_data["order_type"] = "master"
@@ -167,6 +168,9 @@ def booking_method_3(update, context):
 
     return "booking_date"
 
+def booking_method_4(update, context):
+        update.message.reply_text("Для записи , позвоните на номер нашему администратору 4143", reply_markup=main_keyboard())
+
 def booking_date(update, context):
     update.callback_query.answer()
 
@@ -221,4 +225,5 @@ def booking_time(update, context):
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
     )
     return "order"
+
 
