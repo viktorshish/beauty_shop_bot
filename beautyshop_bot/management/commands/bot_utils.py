@@ -12,3 +12,4 @@ def method_keyboard():
     return ReplyKeyboardMarkup([
         ['В салон', 'К мастеру', 'На время'],
     ], resize_keyboard=True)
+

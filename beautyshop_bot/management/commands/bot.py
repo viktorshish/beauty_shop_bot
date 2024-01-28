@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 
 from .bot_booking import booking_start, booking_surname, booking_method_choice, \
     booking_method_1, booking_method_2, booking_method_3, \
-    booking_master, create_order, booking_date, booking_time, booking_phone
+    booking_master, create_order, booking_date, booking_time, booking_phone, booking_gave_location, booking_get_dates_for_salon
 from .bot_handlers import greet_user, show_contacts, show_my_orders, show_speciality
 
 
@@ -27,7 +27,8 @@ class Command(BaseCommand):
         
         booking = ConversationHandler(
             entry_points=[
-                MessageHandler(Filters.regex('^(Хочу записаться)$'), booking_start)
+                MessageHandler(Filters.regex('^(Хочу записаться)$'), booking_start),
+                # MessageHandler(Filters.location, booking_gave_location),
             ],
             states={
                 # "start": [MessageHandler(Filters.text, greet_user)],
@@ -45,12 +46,20 @@ class Command(BaseCommand):
                 "booking_date": [CallbackQueryHandler(booking_date, pattern="^(date|)")],
                 "booking_time": [CallbackQueryHandler(booking_time, pattern="^(time|)" )],
 
+                "chose_salon": [
+                    MessageHandler(Filters.text, booking_gave_location),
+                    MessageHandler(Filters.location, booking_gave_location)
+                ],
+                "chose_master": [MessageHandler(Filters.text, booking_get_dates_for_salon)],
+
+
 
                 "order": [MessageHandler(Filters.text, create_order)],
             },
             fallbacks=[]
         )
         dp.add_handler(booking)
+        # dp.add_handler(MessageHandler(Filters.location, location))
 
         dp.add_handler(MessageHandler(Filters.regex('^(Мои записи)$'), show_my_orders))
 
