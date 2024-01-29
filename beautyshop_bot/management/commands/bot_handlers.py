@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from .bot_utils import main_keyboard, personal_data_keyboard
 
 from beautyshop_bot.db_utils import get_salon_contacts, get_client_orders, get_speciality
@@ -23,6 +25,7 @@ def not_accept_personal_data(update, context):
     update.message.reply_text(welcome_pdf_message, reply_markup=personal_data_keyboard())
 
 def show_contacts(update, contex):
+
     contacts = get_salon_contacts()
 
     answer_message = f"У нас есть следующие салоны:\n\n"
@@ -35,20 +38,27 @@ def show_contacts(update, contex):
     update.message.reply_text(answer_message, reply_markup=main_keyboard())
 
 
+
+
+
 def show_my_orders(update, context):
-    chat_id = update.message.chat_id
+    try:
+        chat_id = update.message.chat_id
 
-    orders = get_client_orders(chat_id)
+        orders = get_client_orders(chat_id)
 
-    message = f'Ваши заказы:\n\n'
-    for order in orders:
-        message += f"Услуга: {order['speciality']}\n"
-        message += f"Мастер: {order['master']}\n"
-        message += f"Время: {order['time']}\n"
-        message += f"\n"
+        message = f'Ваши заказы:\n\n'
+        for order in orders:
+            message += f"Услуга: {order['speciality']}\n"
+            message += f"Мастер: {order['master']}\n"
+            message += f"Время: {order['time']}\n"
+            message += f"\n"
 
-    update.message.reply_text(message, reply_markup=main_keyboard())
-
+        update.message.reply_text(message, reply_markup=main_keyboard())
+    except ObjectDoesNotExist:
+        update.message.reply_text(
+            f'У вас пока нет заказов',
+            reply_markup=main_keyboard())
 
 def show_speciality(update, contex):
     specialitys_salon = get_speciality()
