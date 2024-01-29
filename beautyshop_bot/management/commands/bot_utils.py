@@ -10,6 +10,13 @@ def main_keyboard():
 
 def method_keyboard():
     return ReplyKeyboardMarkup([
-        ['В салон', 'К мастеру', 'На время'],
+        ['В салон', 'К мастеру'],
+        ['На время', 'По номеру телефона'],
+    ], resize_keyboard=True)
+
+
+def personal_data_keyboard():
+    return ReplyKeyboardMarkup([
+        ['Принимаю', 'Не принимаю'],
     ], resize_keyboard=True)
 
