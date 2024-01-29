@@ -74,7 +74,7 @@ def get_masters_by_salon(salon_name):
         available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
 
         for ts in available_time_slots:
-            print(ts)
+            # print(ts)
             if ts.salon.name == salon_name:
                 result.append(
                     {
@@ -93,7 +93,7 @@ def get_masters_by_salon(salon_name):
                 #         ts.start_time + timedelta(hours=i) not in occupied_hours
                 #     )
                 # )
-    print(result)
+    # print(result)
 
     return result
 
