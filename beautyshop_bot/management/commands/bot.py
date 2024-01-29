@@ -8,11 +8,10 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Conve
 from .bot_booking import (booking_start, booking_surname, booking_method_choice,
                           booking_method_1, booking_method_2, booking_method_3,
                           booking_master, create_order, booking_date, booking_time,
-                          booking_phone,booking_gave_location, 
+                          booking_phone, booking_gave_location,
                           booking_get_dates_for_salon, booking_method_4)
 from .bot_handlers import (greet_user, show_contacts, show_my_orders, show_speciality,
                            welcome_pdf_user, not_accept_personal_data)
-from .bot_utils import personal_data_keyboard
 
 
 logging.basicConfig(level=logging.INFO)
@@ -37,10 +36,8 @@ class Command(BaseCommand):
         booking = ConversationHandler(
             entry_points=[
                 MessageHandler(Filters.regex('^(Хочу записаться)$'), booking_start),
-                # MessageHandler(Filters.location, booking_gave_location),
             ],
             states={
-                # "start": [MessageHandler(Filters.text, greet_user)],
                 "name": [MessageHandler(Filters.text, booking_surname)],
                 "surname": [MessageHandler(Filters.text, booking_phone)],
                 "phone": [MessageHandler(Filters.text, booking_method_choice)],
@@ -69,7 +66,6 @@ class Command(BaseCommand):
             fallbacks=[]
         )
         dp.add_handler(booking)
-        # dp.add_handler(MessageHandler(Filters.location, location))
 
         dp.add_handler(MessageHandler(Filters.regex('^(Мои записи)$'), show_my_orders))
 

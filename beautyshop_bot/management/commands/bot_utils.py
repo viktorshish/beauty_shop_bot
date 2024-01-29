@@ -19,4 +19,3 @@ def personal_data_keyboard():
     return ReplyKeyboardMarkup([
         ['Принимаю', 'Не принимаю'],
     ], resize_keyboard=True)
-
