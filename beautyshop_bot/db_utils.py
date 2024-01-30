@@ -20,7 +20,6 @@ def get_salon_contacts():
 def get_distance(a_lon, a_lat, b_lon, b_lat):
     return ((a_lon - b_lon)**2 + (a_lat - b_lat)**2)**(1/2)
 
-
 def get_closest_salon(coordinates):
     salons = Salon.objects.all()
     closest_salon = salons.first()
@@ -40,7 +39,9 @@ def get_closest_salon(coordinates):
         if distance < min_distance:
             closest_salon = salon
             min_distance = distance
+
     return closest_salon
+
 
 
 def get_masters():
@@ -62,15 +63,18 @@ def get_masters_by_salon(salon_name):
     masters = Master.objects.all()
     result = []
     for master in masters:
-        # orders_for_master = Order.objects.filter(master=master,)
+        # timeslots = master.working_hours
 
+        orders_for_master = Order.objects.filter(
+            master=master,
+        )
+        occupied_hours = [ts.order_time for ts in orders_for_master]
         today_date = datetime.today(). \
             replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
-
-        available_time_slots = master.working_hours. \
-            filter(start_time__gt=today_date).all()
+        available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
 
         for ts in available_time_slots:
+            # print(ts)
             if ts.salon.name == salon_name:
                 result.append(
                     {
@@ -82,9 +86,19 @@ def get_masters_by_salon(salon_name):
                     }
                 )
                 break
+                # result[master.name] = master.speciality # result.get(master.name, [])
+                # result[master.name].extend(
+                #     list(
+                #         ts.start_time + timedelta(hours=i) for i in range(0, (ts.end_time.hour - ts.start_time.hour)) if
+                #         ts.start_time + timedelta(hours=i) not in occupied_hours
+                #     )
+                # )
+    # print(result)
+
     return result
 
 
+  
 def get_master_and_timeslots(master_name, date_time=None):
     master = Master.objects.filter(name=master_name).first()
     if date_time:
@@ -99,7 +113,7 @@ def get_master_and_timeslots(master_name, date_time=None):
     today_date = datetime.today().\
         replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow"))
 
-    occupied_hours = [ts.order_time for ts in orders_for_master]
+    occupied_hours = [ ts.order_time for ts in orders_for_master]
 
     available_time_slots = master.working_hours.filter(start_time__gt=today_date).all()
     hours = {}
@@ -142,14 +156,17 @@ def make_order(order_data):
         telegram_chat_id=order_data["telegram_chat_id"],
         telegram_nickname=order_data["telegram_nickname"],
     )
-
+    # print(client)
     master = Master.objects.filter(name=order_data['master_name']).first()
-
+    # print(master)
     order = Order.objects.get_or_create(
         customer=client[0],
         master=master,
-        order_time=datetime.strptime(order_data['date'],  "%d/%m - %H").replace(year=datetime.now().year).replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow")),
+        order_time=datetime.strptime(order_data['date'], "%d/%m - %H").
+            replace(year=datetime.now().year).
+            replace(tzinfo=zoneinfo.ZoneInfo("Europe/Moscow")),
     )
+    # print(order)
     return order
 
 
@@ -188,12 +205,12 @@ def get_dates():
 
   
 def get_speciality():
-    specialties = Speciality.objects.all()
-    specialties_salon = [
+    specialitys = Speciality.objects.all()
+    specialitys_salon = [
         {
             "name": speciality.name,
             "description": speciality.description
         }
-        for speciality in specialties
+        for speciality in specialitys
     ]
-    return specialties_salon
+    return specialitys_salon
