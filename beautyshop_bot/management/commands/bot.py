@@ -7,7 +7,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters,
 from .bot_booking import (booking_start, booking_surname, booking_method_choice,
                           booking_method_1, booking_method_2, booking_method_3,
                           booking_master, create_order, booking_date, booking_time,
-                          booking_phone,booking_gave_location, 
+                          booking_phone, booking_gave_location,
                           booking_get_dates_for_salon, booking_method_4)
 from .bot_handlers import (greet_user, show_contacts, show_my_orders, show_speciality,
                            welcome_pdf_user, not_accept_personal_data)
@@ -16,13 +16,14 @@ from .bot_handlers import (greet_user, show_contacts, show_my_orders, show_speci
 logger.add('debug.log',
            format='{time} {level} {message}',
            level='INFO',
-           rotation='1 MB')
+           rotation='10 MB',
+           retention='10 days')
 
 
 class Command(BaseCommand):
     help = 'Телеграм Бот'
 
-    @logger.catch
+    @logger.catch()
     def handle(self, *args, **options):
         updater = Updater(settings.TG_TOKEN, use_context=True)
 

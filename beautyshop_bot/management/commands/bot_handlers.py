@@ -18,9 +18,11 @@ def welcome_pdf_user(update, context):
         welcome_pdf_message = 'Приветствуем в нашем боте. Перед использованием необходимо принять согласие на обработку ПД'
         update.message.reply_text(welcome_pdf_message, reply_markup=personal_data_keyboard())
 
+
 def not_accept_personal_data(update, context):
     welcome_pdf_message = 'Извините без принятого согласия невозможно продолжить работу'
     update.message.reply_text(welcome_pdf_message, reply_markup=personal_data_keyboard())
+
 
 def show_contacts(update, contex):
     contacts = get_salon_contacts()
@@ -60,4 +62,3 @@ def show_speciality(update, contex):
         message += f"\n"
 
     update.message.reply_text(message, reply_markup=main_keyboard())
-
